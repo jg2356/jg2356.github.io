@@ -46,15 +46,17 @@ function createStairs(riser, tread, width, nbrSteps) {
 
   geom.computeFaceNormals();
 
+  return geom;
+}
+
+function createScene() {
+  var geom = createStairs(1, 2, 4, 5);
+
   // red lambert material, which is affected by lights
   var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, shading: THREE.FlatShading, side: THREE.DoubleSide});
 
   // create our mesh
-  return new THREE.Mesh(geom, mat);
-}
-
-function createScene() {
-  var mesh = createStairs(1, 2, 4, 5);
+  var mesh = new THREE.Mesh(geom, mat);
 
   // lights
   var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
