@@ -39,7 +39,9 @@ function Controls(options) {
                                        this.tubularSegments,
                                        this.arc);
     // lambert material, which is affected by lights
-    var mat = new THREE.MeshLambertMaterial({color: "blue", shading: THREE.FlatShading, side: THREE.DoubleSide});
+    var mat = new THREE.MeshLambertMaterial({color: "blue",
+                                             shading: THREE.FlatShading,
+                                             side: THREE.DoubleSide});
     mat.wireframe = this.wireframe;
     // create our mesh
     mesh = new THREE.Mesh(geom, mat);
@@ -59,13 +61,6 @@ function createScene() {
   gui.add(controls, 'wireframe');
   gui.add(controls, 'Go');
   controls.Go();
-
-  // lights
-  var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
-  light.position.set(-100, -200, 200);
-  var ambientLight = new THREE.AmbientLight(0x222222);
-  scene.add(light);
-  scene.add(ambientLight);
 }
 
 function init() {
@@ -81,6 +76,13 @@ function init() {
   renderer.setSize(canvasWidth, canvasHeight);
   // set the clear color to black, for our open box scene
   renderer.setClearColor(0x000000, 1.0);
+
+  // lights
+  var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
+  light.position.set(-100, -200, 200);
+  var ambientLight = new THREE.AmbientLight(0x222222);
+  scene.add(light);
+  scene.add(ambientLight);
 
   // set the camera position for looking at our open box
   // and point the camera at our target

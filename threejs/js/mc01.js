@@ -35,13 +35,6 @@ function create3DCubeMatrix(a, b, c, offset) {
 function createScene() {
   var cube = create3DCubeMatrix(10, 10, 10, 2.0);
   scene.add(cube);
-
-  // lights
-  var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
-  light.position.set(-200, 200, 200);
-  var ambientLight = new THREE.AmbientLight(0x222222);
-  scene.add(light);
-  scene.add(ambientLight);
 }
 
 function init() {
@@ -57,6 +50,13 @@ function init() {
   renderer.setSize(canvasWidth, canvasHeight);
   // set the clear color to black, for our open box scene
   renderer.setClearColor(0x000000, 1.0);
+
+  // lights
+  var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
+  light.position.set(-200, 200, 200);
+  var ambientLight = new THREE.AmbientLight(0x222222);
+  scene.add(light);
+  scene.add(ambientLight);
 
   // set the camera position for looking at our open box
   // and point the camera at our target
