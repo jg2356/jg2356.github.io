@@ -10,18 +10,12 @@ var clock = new THREE.Clock();
 
 // begin: Challenge C.1
 
-function createHelix(obj, n, radius, angle, dist) {
-  var helix = new THREE.Object3D();
-  for (var i = 0; i < n; i++) {
-    // clone
-    var hobj = obj.clone();
-    // reset
-    hobj.position.x = radius * Math.cos(angle * i);
-    hobj.position.y = radius * Math.sin(angle * i);
-    hobj.position.z = dist * i;
-    helix.add(hobj);
-  }
-  return helix;
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomFloat(min, max) {
+  return Math.random() * (max - min) + min;
 }
 
 function createFloor(x, y) {
@@ -32,21 +26,36 @@ function createFloor(x, y) {
   shape.lineTo(x, 0);
   shape.lineTo(0, 0);
   var geom = new THREE.ShapeGeometry(shape);
-  var mat = new THREE.MeshLambertMaterial({color: 'gray'});
+  var mat = new THREE.MeshLambertMaterial({color: 'gray', shading: THREE.FlatShading, side: THREE.DoubleSide});
   return new THREE.Mesh(geom, mat);
 }
 
 function randomBoxes(nbrBoxes, minSide, maxSide, minHeight, maxHeight) {
   var boxes = new THREE.Object3D();
   for (var i = 0; i < nbrBoxes; i++) {
-    var box = new THREE.BoxGeometry(
+    var bx = randomInt(minSide, maxSide);
+    var by = randomInt(minSide, maxSide);
+    var bz = randomInt(minHeight, maxHeight);
+    var geom = new THREE.BoxGeometry(bx, by, bz);
+    var color = new THREE.Color().setHSL(randomFloat(0, 1),
+                                         randomFloat(0.8, 0.95),
+                                         randomFloat(0.3, 0.7));
+    var mat = new THREE.MeshLambertMaterial({color: color, shading: THREE.FlatShading, side: THREE.DoubleSide, opacity: 0.8, transparent: true});
+    var box = new THREE.Mesh(geom, mat);
+    box.position.x = randomInt(0 + bx / 2, 200 - bx / 2);
+    box.position.y = randomInt(0 + by / 2, 200 - by / 2);
+    box.position.z = bz / 2;
+    boxes.add(box);
   }
+  return boxes;
 }
 
 function createScene() {
   var floor = createFloor(200, 200);
-
   scene.add(floor);
+
+  var boxes = randomBoxes(100, 5, 20, 5, 60);
+  scene.add(boxes);
 }
 
 function init() {
@@ -60,12 +69,12 @@ function init() {
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.setSize(canvasWidth, canvasHeight);
-  // set the clear color to black, for our open box scene
+  // set the clear color to black
   renderer.setClearColor(0x000000, 1.0);
 
   // lights
   var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
-  light.position.set(-200, 200, 200);
+  light.position.set(-20, 20, 200);
   var ambientLight = new THREE.AmbientLight(0x222222);
   scene.add(light);
   scene.add(ambientLight);
