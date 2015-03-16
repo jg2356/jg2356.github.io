@@ -9,7 +9,6 @@ var cameraControls;
 var clock = new THREE.Clock();
 
 var squares;
-var selectedSquares = [];
 var projector = new THREE.Projector();
 var theObjects = [];
 var canvasWidth, canvasHeight;
@@ -83,6 +82,7 @@ function colorFunction(ht, delta, dist) {
   return colors[colorIndex];
 }
 
+var selectedSquares = [];
 
 function updateSquares(selectedSquare) {
   var changed = false;
@@ -109,7 +109,6 @@ function updateSquares(selectedSquare) {
   }
 }
 
-
 function onDocumentMouseDown(event) {
   var mouseVec = new THREE.Vector3(
     2*(event.clientX/canvasWidth)-1,
@@ -124,18 +123,20 @@ function onDocumentMouseDown(event) {
     selectedSquares.push(selectedSquare);
   }
 }
+document.addEventListener('mousedown', onDocumentMouseDown, false);
 
-function distance(sq1, sq2) {
-  dx = sq1.i - sq2.i;
-  dy = sq1.j - sq2.j;
-  return Math.sqrt(dx*dx + dy*dy);
-}
+function render() {
+  var delta = clock.getDelta();
+  var i = 0;
+  while(i < selectedSquares.length) {
+    var selectedSquare = selectedSquares[i];
+    selectedSquare.curWave += (waveRate * delta);
+    updateSquares(selectedSquare);
+    i++;
+  }
 
-
-function createScene() {
-  initializeColors();
-  var matrixOfSquares = createMatrixOfSquares(m, n, offset);
-  scene.add(matrixOfSquares);
+  cameraControls.update(delta);
+  renderer.render(scene, camera);
 }
 
 function initializeColors() {
@@ -153,29 +154,22 @@ function initializeColors() {
   plainColor = colors[nbrColors2] = new THREE.Color().setHSL(0, 0, 0.5);
 }
 
-document.addEventListener('mousedown', onDocumentMouseDown, false);
-
-
 function animate() {
   window.requestAnimationFrame(animate);
   render();
 }
 
-
-function render() {
-  var delta = clock.getDelta();
-  var i = 0;
-  while(i < selectedSquares.length) {
-    var selectedSquare = selectedSquares[i];
-    selectedSquare.curWave += (waveRate * delta);
-    updateSquares(selectedSquare);
-    i++;
-  }
-
-  cameraControls.update(delta);
-  renderer.render(scene, camera);
+function distance(sq1, sq2) {
+  dx = sq1.i - sq2.i;
+  dy = sq1.j - sq2.j;
+  return Math.sqrt(dx*dx + dy*dy);
 }
 
+function createScene() {
+  initializeColors();
+  var matrixOfSquares = createMatrixOfSquares(m, n, offset);
+  scene.add(matrixOfSquares);
+}
 
 function init() {
   canvasWidth = window.innerWidth;
