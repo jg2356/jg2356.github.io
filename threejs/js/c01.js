@@ -26,7 +26,9 @@ function createFloor(x, y) {
   shape.lineTo(x, 0);
   shape.lineTo(0, 0);
   var geom = new THREE.ShapeGeometry(shape);
-  var mat = new THREE.MeshLambertMaterial({color: 'gray', shading: THREE.FlatShading, side: THREE.DoubleSide});
+  var mat = new THREE.MeshLambertMaterial({color: 'gray',
+                                           shading: THREE.FlatShading,
+                                           side: THREE.DoubleSide});
   return new THREE.Mesh(geom, mat);
 }
 
@@ -40,7 +42,11 @@ function randomBoxes(nbrBoxes, minSide, maxSide, minHeight, maxHeight) {
     var color = new THREE.Color().setHSL(randomFloat(0, 1),
                                          randomFloat(0.8, 0.95),
                                          randomFloat(0.3, 0.7));
-    var mat = new THREE.MeshLambertMaterial({color: color, shading: THREE.FlatShading, side: THREE.DoubleSide, opacity: 0.8, transparent: true});
+    var mat = new THREE.MeshLambertMaterial({color: color,
+                                             shading: THREE.FlatShading,
+                                             side: THREE.DoubleSide,
+                                             opacity: 0.8,
+                                             transparent: true});
     var box = new THREE.Mesh(geom, mat);
     box.position.x = randomInt(0 + bx / 2, 200 - bx / 2);
     box.position.y = randomInt(0 + by / 2, 200 - by / 2);
