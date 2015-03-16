@@ -47,13 +47,12 @@ function randomBoxes(nbrBoxes, minSide, maxSide, minHeight, maxHeight) {
     box.position.z = bz / 2;
     boxes.add(box);
   }
-  return boxes;
+  var base = createFloor(200, 200);
+  base.add(boxes);
+  return base;
 }
 
 function createScene() {
-  var floor = createFloor(200, 200);
-  scene.add(floor);
-
   var boxes = randomBoxes(100, 5, 20, 5, 60);
   scene.add(boxes);
 }
