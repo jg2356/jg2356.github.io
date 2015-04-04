@@ -5,9 +5,7 @@
  * April 4, 2014
  ***********/
 
-var camera, scene, renderer;
-var controls, gui;
-var cameraControls;
+var camera, scene, renderer, controls, cameraControls;
 var clock = new THREE.Clock();
 
 function getBond(adata1, adata2, bdata) {
@@ -33,7 +31,8 @@ function getBond(adata1, adata2, bdata) {
                                                  0, -1, 0, 0,
                                                  0, 0, 0, 1));
     var radius = 0.20;
-    var geom = new THREE.CylinderGeometry(radius, radius, direction.length(), 32, 32);
+    var bradius = radius*bdata.bond.type;
+    var geom = new THREE.CylinderGeometry(bradius, bradius, direction.length(), 32, 32);
     var bond = new THREE.Mesh(geom, material);
     bond.applyMatrix(orientation);
     var line = new THREE.Line3(pointX, pointY);
@@ -41,6 +40,7 @@ function getBond(adata1, adata2, bdata) {
     bonds.add(bond);
   }
 
+  bonds.data = bdata.bond;
   return bonds;
 }
 
@@ -49,53 +49,45 @@ function getAtom(adata, opacity) {
   var geom = new THREE.SphereGeometry(1, 32, 32);
   var atom = new THREE.Mesh(geom, mat);
   atom.position.set(adata.x, adata.y, adata.z);
+
+  atom.data = adata.atom;
   return atom;
 }
 
-function getMolStructure(molData, options) {
+function getMolStructure(moldata, options) {
   var structure = new THREE.Object3D();
-  for(var i in molData.atoms) {
-    var adata = molData.atoms[i];
+  structure.atoms = [];
+  structure.bonds = [];
+
+  for(var i in moldata.atoms) {
+    var adata = moldata.atoms[i];
     var atom = getAtom(adata, options.opacity);
     structure.add(atom);
+    structure.atoms.push(atom);
   }
 
-  for(var i in molData.bonds) {
-    var bdata = molData.bonds[i];
-    var adata1 = molData.atoms[bdata.a - 1];
-    var adata2 = molData.atoms[bdata.b - 1];
+  for(var i in moldata.bonds) {
+    var bdata = moldata.bonds[i];
+    var adata1 = moldata.atoms[bdata.a - 1];
+    var adata2 = moldata.atoms[bdata.b - 1];
     var bond = getBond(adata1, adata2, bdata);
     structure.add(bond);
+    structure.bonds.push(bond);
   }
 
   return structure;
 }
 
-function Controls(scene) {
-  var structure, moldata;
+function Controls(scene, gui) {
+  var structure, gui;
   var molform = document.getElementById('molform');
   var molfile = document.getElementById('molfile');
-
   var $this = this;
 
-  var updateFn = function() {
-    if (moldata) {
-      if (structure) {
-        scene.remove(structure);
-      }
-      structure = getMolStructure(moldata, $this);
-      scene.add(structure);
-    }
-  };
+  this.opacity = 0.95;
 
   this.load = function() {
     molfile.click();
-  };
-
-  this.opacity = 0.90;
-
-  this.update = function() {
-    updateFn.call($this);
   };
 
   this.upload = function() {
@@ -110,20 +102,68 @@ function Controls(scene) {
         enctype: 'multipart/form-data',
         processData: false,
         success: function (data) {
-          moldata = data;
-          updateFn.call($this);
+          if (data) {
+            if (structure) {
+              scene.remove(structure);
+            }
+            structure = getMolStructure(data, $this);
+            scene.add(structure);
+            $this.init();
+          }
         }
       });
     }
   };
+
+  this.init = function() {
+    if (gui) {
+      gui.destroy();
+    }
+
+    gui = new dat.GUI();
+    gui.add($this, 'load').name('load mol file...');
+    gui.add($this, 'opacity', 0.00, 1.00).name('atom opacity').step(0.05).onChange(function(value) {
+      if (structure) {
+        for(var i = 0; i < structure.atoms.length; i++) {
+          var atom = structure.atoms[i];
+          atom.material.opacity = value;
+        }
+      }
+    });
+
+    if (structure) {
+      var folder = gui.addFolder('atom colors');
+      folder.open();
+
+      $this.colors = {};
+      var forEachAtomColorKey = function(callback) {
+        for(var i = 0; i < structure.atoms.length; i++) {
+          var atom = structure.atoms[i];
+          var ckey = 'atom_' + atom.data.number + '_color';
+          callback(atom, ckey);
+        }
+      };
+      forEachAtomColorKey(function(atom, ckey) {
+        if (!$this.colors[ckey]) {
+          var chex = '#' + atom.material.color.getHexString();
+          $this.colors[ckey] = chex;
+          folder.addColor($this.colors, ckey).name('[' + atom.data.symbol + ']' + atom.data.name).onChange(function() {
+            forEachAtomColorKey(function(atom, ckey) {
+              var chex = $this.colors[ckey];
+              var cint = parseInt(chex.replace('#', ''), 16);
+              atom.material.color.setHex(cint);
+            });
+          });
+        }
+      });
+    }
+
+    return $this;
+  };
 }
 
 function createScene() {
-  controls = new Controls(scene);
-  gui = new dat.GUI();
-  gui.add(controls, 'load').name('Load File');
-  gui.add(controls, 'opacity', 0.05, 1.00).name('Opacity').step(0.05).listen();
-  gui.add(controls, 'update').name('Update');
+  controls = new Controls(scene).init();
 
   // lots of lights to illuminate the molecule well
   var lights = [{x: 50}, {y: 50}, {z: 50}, {x: -50}, {y: -50}, {z: -50}];
