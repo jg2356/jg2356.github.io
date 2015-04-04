@@ -9,40 +9,8 @@ var camera, scene, renderer;
 var cameraControls;
 var clock = new THREE.Clock();
 
-function createStairs(riser, tread, width, nbrSteps) {
-  var geom = new THREE.Geometry();
-  // create the initial two vertices, the base of the stairs
-  geom.vertices.push(new THREE.Vector3(0, 0, 0));
-  geom.vertices.push(new THREE.Vector3(0, 0, width));
-
-  //steps
-  for (var i = 0; i < nbrSteps; i++) {
-    // get the last two vertices added, the base of the current step
-    var ol = geom.vertices[geom.vertices.length - 2];
-    var or = geom.vertices[geom.vertices.length - 1];
-
-    // create four vertices, rising and then treading on each side (l, r)
-    var v1 = new THREE.Vector3(ol.x, ol.y + riser, ol.z);
-    var v2 = new THREE.Vector3(or.x, or.y + riser, or.z);
-    var v3 = new THREE.Vector3(ol.x + tread, ol.y + riser, ol.z);
-    var v4 = new THREE.Vector3(or.x + tread, or.y + riser, or.z);
-    geom.vertices.push(v1, v2, v3, v4);
-
-    // create the faces using the last 6 vertices added to our geometry
-    var vi = geom.vertices.length;
-    geom.faces.push(new THREE.Face3(vi - 6, vi - 5, vi - 4));
-    geom.faces.push(new THREE.Face3(vi - 5, vi - 4, vi - 3));
-    geom.faces.push(new THREE.Face3(vi - 4, vi - 3, vi - 2));
-    geom.faces.push(new THREE.Face3(vi - 3, vi - 2, vi - 1));
-  }
-
-  geom.computeFaceNormals();
-
-  return geom;
-}
-
 function createScene() {
-  var geom = createStairs(1, 2, 4, 5);
+  var geom = new THREE.BoxGeometry(10, 10, 10);
 
   // red lambert material, which is affected by lights
   var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, shading: THREE.FlatShading, side: THREE.DoubleSide});
@@ -72,10 +40,9 @@ function init() {
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.setSize(canvasWidth, canvasHeight);
-  // set the clear color to black, for our open box scene
   renderer.setClearColor(0x000000, 1.0);
 
-  // set the camera position for looking at our open box
+  // set the camera position
   // and point the camera at our target
   var target = new THREE.Vector3(0, 0, 0);
   camera = new THREE.PerspectiveCamera(40, canvasRatio, 1, 1000);
