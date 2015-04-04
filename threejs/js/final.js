@@ -121,9 +121,9 @@ function Controls(scene) {
 function createScene() {
   controls = new Controls(scene);
   gui = new dat.GUI();
-  gui.add(controls, 'load');
-  gui.add(controls, 'opacity', 0.05, 1.00).step(0.05).listen();
-  gui.add(controls, 'update');
+  gui.add(controls, 'load').name('Load File');
+  gui.add(controls, 'opacity', 0.05, 1.00).name('Opacity').step(0.05).listen();
+  gui.add(controls, 'update').name('Update');
 
   // lots of lights to illuminate the molecule well
   var lights = [{x: 50}, {y: 50}, {z: 50}, {x: -50}, {y: -50}, {z: -50}];
