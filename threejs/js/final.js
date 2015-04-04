@@ -6,10 +6,43 @@
  ***********/
 
 var camera, scene, renderer;
+var controls, gui;
 var cameraControls;
 var clock = new THREE.Clock();
 
+var Controls = function() {
+  var molform = document.getElementById('molform');
+  var molfile = document.getElementById('molfile');
+
+  this.select = function() {
+    molfile.click();
+  };
+
+  this.update = function() {
+    if (molfile.value) {
+      $.ajax({
+        url: 'http://localhost:3000/api/molfile',
+        type: 'POST',
+        data: new FormData(molform),
+        async: true,
+        cache: false,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        processData: false,
+        success: function (data) {
+          console.log(data);
+        }
+      });
+    }
+  };
+};
+
 function createScene() {
+  controls = new Controls();
+  gui = new dat.GUI();
+  gui.add(controls, 'select');
+
+  // create our geometry
   var geom = new THREE.BoxGeometry(10, 10, 10);
 
   // red lambert material, which is affected by lights
