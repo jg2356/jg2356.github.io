@@ -15,8 +15,8 @@
     <body>
         <div id="container">
         </div>
-        <form id="molform" method="POST" enctype="multipart/form-data">
-            <input id="molfile" name="file" type="file" onchange="controls.update();" accept=".mol" />
+        <form id="molform" method="POST" enctype="multipart/form-data" style="display: none;">
+            <input id="molfile" name="file" type="file" onchange="controls.upload();" accept=".mol" />
         </form>
         <script src="js/final.js"></script>
     </body>
