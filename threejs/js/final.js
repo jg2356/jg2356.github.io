@@ -78,7 +78,7 @@ function getMolStructure(moldata, options) {
   return structure;
 }
 
-function Controls(scene, gui) {
+function Controls(scene) {
   var structure, gui;
   var molform = document.getElementById('molform');
   var molfile = document.getElementById('molfile');
