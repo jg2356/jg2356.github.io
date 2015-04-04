@@ -10,7 +10,23 @@ var controls, gui;
 var cameraControls;
 var clock = new THREE.Clock();
 
-var Controls = function() {
+function getMolStructure(molData) {
+  var structure = new THREE.Object3D();
+  for(var i in molData.atoms) {
+    var data = molData.atoms[i];
+    var mat = new THREE.MeshLambertMaterial({color: new THREE.Color(data.atom.color)});
+    var geom = new THREE.SphereGeometry(1, 32, 32);
+    var atom = new THREE.Mesh(geom, mat);
+    atom.position.x = data.x;
+    atom.position.y = data.y;
+    atom.position.z = data.z;
+    structure.add(atom);
+  }
+  return structure;
+}
+
+function Controls() {
+  var structure;
   var molform = document.getElementById('molform');
   var molfile = document.getElementById('molfile');
 
@@ -30,36 +46,34 @@ var Controls = function() {
         enctype: 'multipart/form-data',
         processData: false,
         success: function (data) {
-          console.log(data);
+          if (structure) {
+            scene.remove(structure);
+          }
+          structure = getMolStructure(data);
+          scene.add(structure);
         }
       });
     }
   };
-};
+}
 
 function createScene() {
   controls = new Controls();
   gui = new dat.GUI();
   gui.add(controls, 'select');
 
-  // create our geometry
-  var geom = new THREE.BoxGeometry(10, 10, 10);
-
-  // red lambert material, which is affected by lights
-  var mat = new THREE.MeshLambertMaterial({color: 0xFF0000, shading: THREE.FlatShading, side: THREE.DoubleSide});
-
-  // create our mesh
-  var mesh = new THREE.Mesh(geom, mat);
-
-  // lights
-  var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
-  light.position.set(-15, 8, 2);
+  // lots of lights to illuminate the molecule well
+  var light0 = new THREE.PointLight(0xFFFFFF, 1, 1000);
+  light0.position.set(50, 0, 0);
+  scene.add(light0);
+  var light1 = new THREE.PointLight(0xFFFFFF, 1, 1000);
+  light1.position.set(0, 50, 0);
+  scene.add(light1);
+  var light2 = new THREE.PointLight(0xFFFFFF, 1, 1000);
+  light2.position.set(0, 0, 50);
+  scene.add(light2);
   var ambientLight = new THREE.AmbientLight(0x222222);
-  scene.add(light);
   scene.add(ambientLight);
-
-  // add to the scene
-  scene.add(mesh);
 }
 
 function init() {
