@@ -114,7 +114,7 @@ function Controls(scene) {
   this.upload = function() {
     if (molfile.value) {
       $.ajax({
-        url: 'http://localhost:3000/api/molfile',
+        url: 'http://jg2356.cloudapp.net/api/molfile',
         type: 'POST',
         data: new FormData(molform),
         async: true,
